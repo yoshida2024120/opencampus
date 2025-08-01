@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>3 x 1ビット メモリ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background-color: white;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+    .controls {
+      margin: 10px;
+    }
+    .controls label {
+      font-size: 18px;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>3 x 1ビット　メモリ</h2>
+  <div class="controls">
+    <label><input type="checkbox" id="A1" onchange="update()"> A1</label>
+    <label><input type="checkbox" id="A2" onchange="update()"> A2</label>
+    <label><input type="checkbox" id="A3" onchange="update()"> A3</label>
+    <label><input type="checkbox" id="B" onchange="update()"> B (共有)</label>
+  </div>
+  <canvas id="canvas" width="500" height="700"></canvas>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const color = v => v ? "red" : "black";
+    const bitText = v => v ? "1" : "0";
+
+    let prev_Q1 = true;
+    let prev_Q2 = true;
+    let prev_Q3 = true;
+
+    function drawMemoryBox(x, y, label) {
+      ctx.fillStyle = "#eee";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 4;
+      ctx.fillRect(x, y, 200, 100);
+      ctx.strokeRect(x, y, 200, 100);
+      ctx.fillStyle = "black";
+      ctx.font = "25px sans-serif";
+      ctx.fillText(label, x + 60, y + 55);
+    }
+
+    function drawLine(path, isOn, width = 5) {
+      ctx.strokeStyle = color(isOn);
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(...path[0]);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(...path[i]);
+      }
+      ctx.stroke();
+    }
+
+    function drawBit(x, y, value) {
+      ctx.fillStyle = color(value);
+      ctx.font = "16px sans-serif";
+      ctx.fillText(bitText(value), x, y);
+    }
+
+    function update() {
+      const a1 = document.getElementById("A1").checked;
+      const a2 = document.getElementById("A2").checked;
+      const a3 = document.getElementById("A3").checked;
+      const b = document.getElementById("B").checked;
+
+      // 上段
+      let O1_1 = !(a1 && b);
+      let O2_1 = !(b && O1_1);
+      let Q1 = prev_Q1;
+      let O4_1;
+      for (let i = 0; i < 5; i++) {
+        O4_1 = !(O1_1 && Q1);
+        Q1 = !(O2_1 && O4_1);
+      }
+      prev_Q1 = Q1;
+
+      // 中段
+      let O1_2 = !(a2 && b);
+      let O2_2 = !(b && O1_2);
+      let Q2 = prev_Q2;
+      let O4_2;
+      for (let i = 0; i < 5; i++) {
+        O4_2 = !(O1_2 && Q2);
+        Q2 = !(O2_2 && O4_2);
+      }
+      prev_Q2 = Q2;
+
+      // 下段
+      let O1_3 = !(a3 && b);
+      let O2_3 = !(b && O1_3);
+      let Q3 = prev_Q3;
+      let O4_3;
+      for (let i = 0; i < 5; i++) {
+        O4_3 = !(O1_3 && Q3);
+        Q3 = !(O2_3 && O4_3);
+      }
+      prev_Q3 = Q3;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // A1-A3 入力（独立）
+      drawLine([[10, 120], [100, 120]], a1);
+      drawLine([[10, 320], [100, 320]], a2);
+      drawLine([[10, 520], [100, 520]], a3);
+
+      drawBit(10, 110, a1);
+      drawBit(10, 310, a2);
+      drawBit(10, 510, a3);
+
+      // B 入力（共通）
+      drawLine([[10, 580], [60, 580]], b);
+      drawLine([[60, 580], [60, 180], [100, 180]], b); // 上へ
+      drawLine([[60, 580], [60, 380], [100, 380]], b); // 中へ
+      drawLine([[60, 580], [100, 580]], b);           // 下へ
+
+      // 上段
+      drawMemoryBox(100, 100, "1bitM");
+      drawLine([[300, 150], [400, 150]], O4_1);
+      drawBit(310, 140, O4_1);
+
+      // 中段
+      drawMemoryBox(100, 300, "1bitM");
+      drawLine([[300, 350], [400, 350]], O4_2);
+      drawBit(310, 340, O4_2);
+
+      // 下段
+      drawMemoryBox(100, 500, "1bitM");
+      drawLine([[300, 550], [400, 550]], O4_3);
+      drawBit(310, 540, O4_3);
+
+    ctx.beginPath();  // 新しい図形の描画を開始
+    ctx.arc(60, 180, 5, 0, Math.PI * 2); // 円を定義
+    ctx.fillStyle = color(b); // 塗りの色を指定
+    ctx.fill(); // 塗りつぶし
+    ctx.strokeStyle = color(b); // 枠線の色を指定（塗りと同じか別色でもOK）
+    ctx.stroke(); // 枠線を描く
+  
+    ctx.beginPath();  // 新しい図形の描画を開始
+    ctx.arc(60, 380, 5, 0, Math.PI * 2); // 円を定義
+    ctx.fillStyle = color(b); // 塗りの色を指定
+    ctx.fill(); // 塗りつぶし
+    ctx.strokeStyle = color(b); // 枠線の色を指定（塗りと同じか別色でもOK）
+    ctx.stroke(); // 枠線を描く
+  
+    ctx.beginPath();  // 新しい図形の描画を開始
+    ctx.arc(60, 580, 5, 0, Math.PI * 2); // 円を定義
+    ctx.fillStyle = color(b); // 塗りの色を指定
+    ctx.fill(); // 塗りつぶし
+    ctx.strokeStyle = color(b); // 枠線の色を指定（塗りと同じか別色でもOK）
+    ctx.stroke(); // 枠線を描く
+  
+    }
+
+    update();
+  </script>
+</body>
+</html>
