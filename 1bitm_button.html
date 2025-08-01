@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Dフリップフロップ回路</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background-color: white;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+    .controls {
+      margin: 20px;
+    }
+    .controls button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      min-width: 160px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Dフリップフロップ回路</h2>
+
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  <div class="controls">
+    <button id="btnA" onclick="toggleInput('A')">A（Set）: OFF</button>
+    <button id="btnB" onclick="toggleInput('B')">B（Reset）: OFF</button>
+    <br>
+    <button onclick="window.open('https://yoshida2024120.github.io/opencampus/', '_self')">
+      戻る
+    </button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let inputA = false;
+    let inputB = false;
+    let previousQ = true;
+
+    function getColor(signal) {
+      return signal ? "red" : "black";
+    }
+
+    function toggleInput(name) {
+      if (name === 'A') {
+        inputA = !inputA;
+        document.getElementById("btnA").innerText = `A（Set）: ${inputA ? "ON" : "OFF"}`;
+      } else if (name === 'B') {
+        inputB = !inputB;
+        document.getElementById("btnB").innerText = `B（Reset）: ${inputB ? "ON" : "OFF"}`;
+      }
+      update();
+    }
+
+    function drawGate(x, y, label) {
+      ctx.fillStyle = "#eee";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, 100, 100);
+      ctx.fillStyle = "black";
+      ctx.font = "20px sans-serif";
+      ctx.fillText(label, x + 15, y + 55);
+    }
+
+    function drawLine(path, isOn, width = 5) {
+      ctx.strokeStyle = getColor(isOn);
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(...path[0]);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(...path[i]);
+      }
+      ctx.stroke();
+    }
+
+    function update() {
+      const A = inputA;
+      const B = inputB;
+
+      let O1 = !(A && B);
+      let O2 = !(B && O1);
+      let Q = previousQ;
+      let O4;
+
+      for (let i = 0; i < 5; i++) {
+        O4 = !(O1 && Q);
+        Q = !(O2 && O4);
+      }
+
+      previousQ = Q;
+      let xx = 80;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawGate(50 + xx, 50, "NAND1");
+      drawGate(50 + xx, 230, "NAND2");
+      drawGate(300 + xx, 50, "NAND4");
+      drawGate(300 + xx, 230, "NAND3");
+
+      drawLine([[0 + xx - 10, 65], [50 + xx, 65]], A);
+      drawLine([[10 + xx, 310], [10 + xx, 125], [50 + xx, 125]], B);
+      drawLine([[0 + xx - 10, 310], [50 + xx, 310]], B);
+      drawLine([[150 + xx, 80], [300 + xx, 80]], O1);
+      drawLine([[175 + xx, 80], [175 + xx, 145], [25 + xx, 235], [25 + xx, 265], [50 + xx, 265]], O1);
+      drawLine([[150 + xx, 300], [300 + xx, 300]], O2);
+      drawLine([[420 + xx, 90], [420 + xx, 160], [270 + xx, 230], [270 + xx, 260], [300 + xx, 260]], O4);
+      drawLine([[400 + xx, 90], [600 + xx, 90]], O4, 5);
+      drawLine([[400 + xx, 260], [430 + xx, 260], [430 + xx, 210], [430 + xx, 210], [260 + xx, 145], [260 + xx, 120], [300 + xx, 120]], Q);
+
+      // 状態を示す丸
+      ctx.beginPath();
+      ctx.arc(10 + xx, 310, 5, 0, Math.PI * 2);
+      ctx.fillStyle = getColor(B);
+      ctx.fill();
+      ctx.strokeStyle = getColor(B);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(175 + xx, 80, 5, 0, Math.PI * 2);
+      ctx.fillStyle = getColor(O1);
+      ctx.fill();
+      ctx.strokeStyle = getColor(O1);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(420 + xx, 90, 5, 0, Math.PI * 2);
+      ctx.fillStyle = getColor(O4);
+      ctx.fill();
+      ctx.strokeStyle = getColor(O4);
+      ctx.stroke();
+
+      ctx.fillStyle = "black";
+      ctx.font = "40px Arial";
+      ctx.fillText("出力", 650, 80);
+      ctx.fillText(A ? "1" : "0", 30, 80);
+      ctx.fillText(B ? "1" : "0", 30, 320);
+      ctx.fillText(O4 ? "1" : "0", 620, 80);
+    }
+
+    update();
+  </script>
+</body>
+</html>
