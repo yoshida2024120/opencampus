@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>NANDゲート</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    canvas { border: 1px solid #ccc; background: white; margin-top: 10px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+<h1>NANDゲートシミュレータ</h1>
+<canvas id="nandCanvas" width="800" height="400"></canvas><br>
+<button onclick="toggleInput(1)">入力A: 0</button>
+<button onclick="toggleInput(2)">入力B: 0</button>
+
+<br>
+  <button onclick="window.open('https://yoshida2024120.github.io/opencampus/', '_self')">
+    戻る
+  </button>
+
+<script>
+  let input1 = false;
+  let input2 = false;
+
+  function toggleInput(n) {
+    if (n === 1) input1 = !input1;
+    if (n === 2) input2 = !input2;
+
+    document.querySelectorAll("button")[n - 1].textContent =
+      `入力${n === 1 ? 'A' : 'B'}: ${eval("input" + n) ? "1" : "0"}`;
+
+    drawGate();
+  }
+
+  function drawGate() {
+    const canvas = document.getElementById("nandCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const onColor = "red";
+    const offColor = "gray";
+    const lw = 15;
+
+    const color1 = input1 ? onColor : offColor;
+    const color2 = input2 ? onColor : offColor;
+
+    const startX = 20;
+    const y1 = 130, y2 = 270, centerY = 200;
+    const gateLeft = 220, gateRight = 460;
+
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = color1;
+    ctx.beginPath(); ctx.moveTo(200, 200); ctx.lineTo(300, 200); ctx.stroke();
+    ctx.strokeStyle = color2;
+    ctx.beginPath(); ctx.moveTo(200, 260); ctx.lineTo(300, 260); ctx.stroke();
+
+    ctx.fillStyle = "black";
+    ctx.font = "30px Arial";
+    ctx.fillText(input1 ? "1" : "0", 167, 203);
+    ctx.fillText(input2 ? "1" : "0", 167, 268);
+
+
+    ctx.fillStyle = "black";
+    ctx.font = "30px Arial";
+    ctx.fillText("A", 120, 200);
+    ctx.fillText("B", 120, 265);
+
+    // ANDゲート＋反転丸
+    //ctx.strokeStyle = "black";
+    //ctx.lineWidth = 4;
+    //ctx.beginPath(); ctx.moveTo(gateLeft, 100); ctx.lineTo(gateLeft, 300); ctx.stroke();
+    //ctx.beginPath(); ctx.moveTo(gateLeft, 100); ctx.lineTo(gateRight - 110, 100); ctx.stroke();
+    //ctx.beginPath(); ctx.moveTo(gateLeft, 300); ctx.lineTo(gateRight - 110, 300); ctx.stroke();
+    //ctx.beginPath();
+    //ctx.arc((gateLeft + gateRight) / 2, centerY, 100, Math.PI / 2, -Math.PI / 2, true);
+    //ctx.stroke();
+
+    // 反転丸
+    //ctx.beginPath();
+    //ctx.arc(gateRight-5, centerY, 15, 0, Math.PI * 2);
+    //ctx.stroke();
+
+    ctx.fillStyle = "#eee";
+    ctx.fillRect(300, 180, 100, 100);
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 5;
+    ctx.strokeRect(300, 180, 100, 100);
+    ctx.fillStyle = "black";
+    ctx.font = "30px Arial";
+    ctx.fillText("NAND", 310, 240);
+
+
+    const output = !(input1 && input2);
+    const outputColor = output ? onColor : offColor;
+
+    // 出力線
+    ctx.strokeStyle = outputColor;
+    ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(403, 230); ctx.lineTo(520, 230); ctx.stroke();
+
+    // ラベル
+    ctx.fillStyle = "black";
+    ctx.font = "30px Arial";
+    ctx.fillText("出力", 530, 180);
+//    ctx.fillStyle = outputColor;
+    ctx.fillStyle = "black";
+    ctx.fillText(output ? "1" : "0", 540, 240);
+  }
+
+  drawGate();
+</script>
+</body>
+</html>

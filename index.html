@@ -9,10 +9,19 @@
       text-align: center;
       padding-top: 100px;
     }
-    button {
+    a.button {
+      display: inline-block;
       font-size: 20px;
       padding: 10px 30px;
       margin: 20px;
+      background-color: #eee;
+      border: 1px solid #999;
+      border-radius: 5px;
+      text-decoration: none;
+      color: black;
+    }
+    a.button:hover {
+      background-color: #ddd;
     }
   </style>
 </head>
@@ -20,17 +29,14 @@
   <h1>2025年 明治学院 模擬授業用ページ</h1>
   <p>以下のボタンをクリックして、回路シミュレーションを開いてください。</p>
 
-  <!-- 新しいタブで memory.html を開くリンク -->
-  <a href="AND.html" target="_blank">
-    <button>ANDゲート</button>
-  </a>
+  <a href="AND.html" target="_blank" class="button">ANDゲート</a>
+  <a href="OR.html" target="_blank" class="button">ORゲート</a>
+  <a href="XOR.html" target="_blank" class="button">ORゲート</a>
+  <a href="NAND.html" target="_blank" class="button">NANDゲート</a>
+  <a href="HA_box.html" target="_blank" class="button">半加算器</a>
+  
 
-  <a href="OR.html" target="_blank">
-    <button>ORゲート</button> 
-  </a>
 
-  <a href="1bitm_button.html" target="_blank">
-    <button>1ビットメモリー</button> 
-  </a>
+  <a href="1bitm_button.html" target="_blank" class="button">1ビットメモリー</a>
 </body>
 </html>
