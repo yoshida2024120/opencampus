@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>3 x 1ビット メモリ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background-color: white;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+    .controls {
+      margin: 20px;
+    }
+    .controls button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      min-width: 160px;
+    }
+  </style>
+</head>
+<body>
+  <h2>3 x 1ビット メモリ</h2>
+
+  <canvas id="canvas" width="500" height="700"></canvas>
+
+  <div class="controls">
+    <button id="btnA1" onclick="toggleInput('A1')">A1: OFF</button>
+    <button id="btnA2" onclick="toggleInput('A2')">A2: OFF</button>
+    <button id="btnA3" onclick="toggleInput('A3')">A3: OFF</button>
+    <button id="btnB" onclick="toggleInput('B')">B（共有）: OFF</button>
+    <br>
+    <button onclick="window.open('https://yoshida2024120.github.io/opencampus/', '_self')">戻る</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let inputA1 = false;
+    let inputA2 = false;
+    let inputA3 = false;
+    let inputB = false;
+
+    let prev_Q1 = true;
+    let prev_Q2 = true;
+    let prev_Q3 = true;
+
+    function color(val) {
+      return val ? "red" : "black";
+    }
+
+    function bitText(val) {
+      return val ? "1" : "0";
+    }
+
+    function toggleInput(name) {
+      if (name === "A1") {
+        inputA1 = !inputA1;
+        document.getElementById("btnA1").innerText = `A1: ${inputA1 ? "ON" : "OFF"}`;
+      } else if (name === "A2") {
+        inputA2 = !inputA2;
+        document.getElementById("btnA2").innerText = `A2: ${inputA2 ? "ON" : "OFF"}`;
+      } else if (name === "A3") {
+        inputA3 = !inputA3;
+        document.getElementById("btnA3").innerText = `A3: ${inputA3 ? "ON" : "OFF"}`;
+      } else if (name === "B") {
+        inputB = !inputB;
+        document.getElementById("btnB").innerText = `B（共有）: ${inputB ? "ON" : "OFF"}`;
+      }
+      update();
+    }
+
+    function drawMemoryBox(x, y, label) {
+      ctx.fillStyle = "#eee";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 4;
+      ctx.fillRect(x, y, 200, 100);
+      ctx.strokeRect(x, y, 200, 100);
+      ctx.fillStyle = "black";
+      ctx.font = "25px sans-serif";
+      ctx.fillText(label, x + 60, y + 55);
+    }
+
+    function drawLine(path, isOn, width = 5) {
+      ctx.strokeStyle = color(isOn);
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(...path[0]);
+      for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(...path[i]);
+      }
+      ctx.stroke();
+    }
+
+    function drawBit(x, y, value) {
+      ctx.fillStyle = color(value);
+      ctx.font = "16px sans-serif";
+      ctx.fillText(bitText(value), x, y);
+    }
+
+    function computeQ(a, prevQ, b) {
+      let O1 = !(a && b);
+      let O2 = !(b && O1);
+      let Q = prevQ;
+      let O4;
+      for (let i = 0; i < 5; i++) {
+        O4 = !(O1 && Q);
+        Q = !(O2 && O4);
+      }
+      return [Q, O4];
+    }
+
+    function update() {
+      const [Q1, O4_1] = computeQ(inputA1, prev_Q1, inputB);
+      const [Q2, O4_2] = computeQ(inputA2, prev_Q2, inputB);
+      const [Q3, O4_3] = computeQ(inputA3, prev_Q3, inputB);
+
+      prev_Q1 = Q1;
+      prev_Q2 = Q2;
+      prev_Q3 = Q3;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawLine([[10, 120], [100, 120]], inputA1);
+      drawLine([[10, 320], [100, 320]], inputA2);
+      drawLine([[10, 520], [100, 520]], inputA3);
+      drawBit(10, 110, inputA1);
+      drawBit(10, 310, inputA2);
+      drawBit(10, 510, inputA3);
+
+      drawLine([[10, 580], [60, 580]], inputB);
+      drawLine([[60, 580], [60, 180], [100, 180]], inputB);
+      drawLine([[60, 580], [60, 380], [100, 380]], inputB);
+      drawLine([[60, 580], [100, 580]], inputB);
+
+      drawMemoryBox(100, 100, "1bitM");
+      drawLine([[300, 150], [400, 150]], O4_1);
+      drawBit(310, 140, O4_1);
+
+      drawMemoryBox(100, 300, "1bitM");
+      drawLine([[300, 350], [400, 350]], O4_2);
+      drawBit(310, 340, O4_2);
+
+      drawMemoryBox(100, 500, "1bitM");
+      drawLine([[300, 550], [400, 550]], O4_3);
+      drawBit(310, 540, O4_3);
+
+      [[60, 180], [60, 380], [60, 580]].forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = color(inputB);
+        ctx.fill();
+        ctx.strokeStyle = color(inputB);
+        ctx.stroke();
+      });
+    }
+
+    update();
+  </script>
+</body>
+</html>
