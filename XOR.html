@@ -1,27 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>XORゲート</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; }
-    canvas { border: 1px solid #ccc; background: white; }
-    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
-  </style>
-</head>
-<body>
-
-<h1>XORゲートシミュレータ</h1>
-<canvas id="xorCanvas" width="800" height="400"></canvas>
-<br>
-<button onclick="toggleInput(1)">入力A: 0</button>
-<button onclick="toggleInput(2)">入力B: 0</button>
-
-<br>
-  <button onclick="window.open('https://yoshida2024120.github.io/opencampus/', '_self')">
-    戻る
-  </button>
-
 <script>
   let input1 = false;
   let input2 = false;
@@ -30,8 +6,15 @@
     if (n === 1) input1 = !input1;
     if (n === 2) input2 = !input2;
 
-    document.querySelectorAll("button")[n - 1].textContent =
-      `入力${n === 1 ? 'A' : 'B'}: ${eval("input" + n) ? "1" : "O"}`;
+    const buttons = document.querySelectorAll("button");
+
+    if (n === 1) {
+      buttons[0].textContent = `入力A: ${input1 ? "1" : "0"}`;
+    }
+
+    if (n === 2) {
+      buttons[1].textContent = `入力B: ${input2 ? "1" : "0"}`;
+    }
 
     drawGate();
   }
@@ -45,7 +28,7 @@
     const offColor = "gray";
     const lw = 15;
 
-    // 入力線
+    // 入力線 A
     ctx.strokeStyle = input1 ? onColor : offColor;
     ctx.lineWidth = lw;
     ctx.beginPath();
@@ -53,6 +36,7 @@
     ctx.lineTo(300, 200);
     ctx.stroke();
 
+    // 入力線 B
     ctx.strokeStyle = input2 ? onColor : offColor;
     ctx.beginPath();
     ctx.moveTo(200, 260);
@@ -68,40 +52,22 @@
     ctx.fillText("B", 120, 265);
     ctx.fillText(input2 ? "1" : "0", 167, 268);
 
-    // XORゲート本体（後方カーブ）
-    //ctx.strokeStyle = "black";
-    //ctx.lineWidth = 4;
-    //ctx.beginPath();
-    //ctx.moveTo(220, 100);
-    //ctx.quadraticCurveTo(250, 200, 220, 300); // 中央湾曲線
-    //ctx.stroke();
-
-    // 追加のカーブ（XOR特有）
-    //ctx.beginPath();
-    //ctx.moveTo(190, 100);
-    //ctx.quadraticCurveTo(220, 200, 190, 300); // 後ろのカーブ
-    //ctx.stroke();
-
-    // 前方（OR風）カーブ
-    //ctx.beginPath();
-    //ctx.moveTo(220, 100);
-    //ctx.bezierCurveTo(480, 120, 480, 280, 220, 300);
-    //ctx.stroke();
-
+    // XORゲート本体
     ctx.fillStyle = "#eee";
     ctx.fillRect(300, 180, 100, 100);
-
 
     ctx.strokeStyle = "black";
     ctx.lineWidth = 5;
     ctx.strokeRect(300, 180, 100, 100);
+
     ctx.fillStyle = "black";
     ctx.font = "30px Arial";
     ctx.fillText("XOR", 320, 240);
 
+    // XORの出力
+    // AとBが異なるときだけ1
+    const output = input1 !== input2;
 
-    // 出力線
-    const output = (input1 !== input2);
     const outputColor = output ? onColor : offColor;
     ctx.strokeStyle = outputColor;
     ctx.lineWidth = lw;
@@ -113,14 +79,11 @@
     // 出力ラベル
     ctx.fillStyle = "black";
     ctx.font = "40px Arial";
-
     ctx.fillText("出力", 530, 180);
+
     ctx.fillStyle = outputColor;
     ctx.fillText(output ? "1" : "0", 540, 240);
   }
 
-  drawGate(); // 初回描画
+  drawGate();
 </script>
-
-</body>
-</html>
